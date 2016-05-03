@@ -1,76 +1,63 @@
 package main;
 
-public class Main
-{
-	public static void main(String[] args)
-	{
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Main {
+	public static void main(String[] args) {
 		new Main();
 	}
-	
-	public Main()
-	{
+
+	public Main() {
 		System.out.println("Does nothing...");
 	}
 }
 
-public class BencodeingParser
-{
-	public bencodeingUnparse(String input)
-	{
-		switch (input.charAt(0))
-		{
-		case "i":
-		{
-			//Integer
-			
+class BencodeingParser {
+	public void bencodeingUnparse(String input) {
+		switch (input.charAt(0)) {
+		case 'i': {
+			// Integer
+
 		}
-		case "l":
-		{
-			//List
-			
+		case 'l': {
+			// List
+
 		}
-		case "d":
-		{
-			//Dictionary
-			
+		case 'd': {
+			// Dictionary
+
 		}
-		default:
-		{
-			if (Character.isDigit(input.charAt(0)))
-			{
-				//First character is a digit for length
-				
-			}
-			else
-			{
-				//Error, first character is a unknown character
-			
+		default: {
+			if (Character.isDigit(input.charAt(0))) {
+				// First character is a digit for length
+
+			} else {
+				// Error, first character is a unknown character
+
 			}
 		}
 		}
 	}
-	
-	private int intUnparse (String input)
-	{
+
+	private int intUnparse(String input) {
 		String value = input.substring(1, input.length() - 1);
-		if (value.charAt(0) == '0' && value.length != 1)
-		{
-			//Error, leading zeros
+		if (value.charAt(0) == '0' && value.length() != 1) {
+			// Error, leading zeros
+			
 		}
-		if (value.length > 1 && (value.charAt(0) == '-' && value.charAt(1) == '0'))
-		{
-			//Error, invalid input
+		if (value.length() > 1 && (value.charAt(0) == '-' && value.charAt(1) == '0')) {
+			// Error, invalid input
 		}
 		return Integer.parseInt(value);
 	}
-	
-	private ArrayList<???> listUnparse (String input)
+
+	private ArrayList<Integer> listUnparse(String input)
 	{
-		
+		return null;
 	}
-	
-	private HashMap<???> dictUnparse (String input)
-	{
-		
+
+	private HashMap<Integer, String> dictUnparse(String input) {
+		return null;
 	}
 }
