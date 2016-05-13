@@ -2,6 +2,8 @@ package main;
 
 import java.util.*;
 
+import network.*;
+
 public class Torrent
 {
 	private String name;
@@ -10,7 +12,7 @@ public class Torrent
 	private List<String> fileNames;
 	private List<Long> fileLengths;
 	private List<byte[]> fileHashes;
-	private List<Connection> connections;
+	private PeerManager peerManager;
 	
 	public Torrent(String name, int pieceLength)
 	{
@@ -20,7 +22,7 @@ public class Torrent
 		this.fileNames = new ArrayList<String>();
 		this.fileLengths = new ArrayList<Long>();
 		this.fileHashes = new ArrayList<byte[]>();
-		this.connections = new ArrayList<Connection>();
+		this.peerManager = new PeerManager(this);
 	}
 	
 	public String getName()
@@ -68,5 +70,15 @@ public class Torrent
 		this.fileNames.add(name);
 		this.fileLengths.add(length);
 		this.fileHashes.add(hash);
+	}
+	
+	public byte[] getInfoHash()
+	{
+		return new byte[20];
+	}
+	
+	public PeerManager getPeerManager()
+	{
+		return this.peerManager;
 	}
 }

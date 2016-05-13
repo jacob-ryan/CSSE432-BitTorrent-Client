@@ -15,6 +15,7 @@ public class MainPanel extends JPanel
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, new TopPanel(), new BottomPanel());
+		splitPane.setResizeWeight(0.5);
 		this.add(splitPane);
 	}
 }

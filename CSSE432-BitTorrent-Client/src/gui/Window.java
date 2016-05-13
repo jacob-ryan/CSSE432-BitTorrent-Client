@@ -23,6 +23,7 @@ public class Window extends JFrame
 		this.add(new MainPanel());
 		
 		this.setVisible(true);
+		new GUIUpdater();
 	}
 	
 	private void setWindowsLaF()

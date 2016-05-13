@@ -12,6 +12,9 @@ public class Main
 	public Main()
 	{
 		new Window();
-		System.out.println("Created GUI window...");
+		LoggingPanel.log("Created GUI window...");
+		
+		Torrent torrent = new Torrent("Foo Bar", 256 * 1024);
+		TorrentManager.getInstance().addTorrent(torrent);
 	}
 }
