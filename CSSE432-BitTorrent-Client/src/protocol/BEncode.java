@@ -26,6 +26,7 @@ public class BEncode
 	
 	private static String parseString(String input) {
 		String toReturn = input.length() + ":" + input;
+		System.out.println("String Parse: " + toReturn);
 		return toReturn;
 	}
 
@@ -35,6 +36,7 @@ public class BEncode
 			toReturn += "-";
 		}
 		toReturn += input.toString() + "e";
+		System.out.println("Integer Parse: " + toReturn);
 		return toReturn;
 	}
 	
@@ -44,6 +46,7 @@ public class BEncode
 			toReturn = parse(o);
 		}
 		toReturn += "e";
+		System.out.println("List Parse: " + toReturn);
 		return toReturn;
 	}
 	
@@ -55,6 +58,7 @@ public class BEncode
 			toReturn += parse(input.get(k));
 		}
 		toReturn += "e";
+		System.out.println("Dictionary Parse: " + toReturn);
 		return toReturn ;
 	}
 	
@@ -109,7 +113,7 @@ public class BEncode
 		{
 			// Error, invalid input
 		}
-		System.out.println("Integer Parse: " + value);
+		System.out.println("Integer Unparse: " + value);
 		return Integer.parseInt(value);
 	}
 	
@@ -139,7 +143,7 @@ public class BEncode
 			newList.add(item);
 			currString = currString.substring(itemLength);
 		}
-		System.out.println("List Parse: " + newList.toString());
+		System.out.println("List Unparse: " + newList.toString());
 		return newList;
 	}
 
@@ -168,7 +172,7 @@ public class BEncode
 			newDict.put(key, value);
 			currString = currString.substring(valLength);
 		}
-		System.out.println("Dictionary Parse: " + newDict.toString());
+		System.out.println("Dictionary Unparse: " + newDict.toString());
 		return newDict;
 	}
 }
