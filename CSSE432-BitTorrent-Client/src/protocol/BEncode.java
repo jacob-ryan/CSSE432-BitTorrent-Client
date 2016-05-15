@@ -18,6 +18,8 @@ public class BEncode
 			parsedObj = parseDict((Map<String, Object>)input);
 		} else if (input instanceof String) {
 			parsedObj = parseString((String) input);
+		} else {
+			parsedObj = parseString("ParseError");
 		}
 		return parsedObj;
 	}
@@ -58,7 +60,8 @@ public class BEncode
 	
 	public static Object unparse(String input)
 	{
-		switch (input.charAt(0))
+		char firstChar = input.charAt(0);
+		switch (firstChar)
 		{
 			case 'i':
 			{
@@ -77,7 +80,7 @@ public class BEncode
 			}
 			default:
 			{
-				char firstChar = input.charAt(0);
+				
 				if (Character.isDigit(firstChar))
 				{
 					// First character is a digit for length
