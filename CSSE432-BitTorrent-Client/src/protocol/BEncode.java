@@ -4,6 +4,58 @@ import java.util.*;
 
 public class BEncode
 {
+	@SuppressWarnings("unchecked")
+	public static String parse(Object input) {
+		String parsedObj = "";
+		if (input instanceof Integer) {
+			// Parse Integer
+			parsedObj = parseInt((Integer) input);
+		} else if (input instanceof List<?>) {
+			// Parse List
+			parsedObj = parseList((List<Object>) input);
+		} else if (input instanceof Map<?, ?>) {
+			// Parse Map
+			parsedObj = parseDict((Map<String, Object>)input);
+		} else if (input instanceof String) {
+			parsedObj = parseString((String) input);
+		}
+		return parsedObj;
+	}
+	
+	private static String parseString(String input) {
+		String toReturn = input.length() + ":" + input;
+		return toReturn;
+	}
+
+	private static String parseInt(Integer input) {
+		String toReturn = "i";
+		if(input < 0) {
+			toReturn += "-";
+		}
+		toReturn += input.toString() + "e";
+		return toReturn;
+	}
+	
+	private static String parseList(List<Object> input) {
+		String toReturn = "l";
+		for(Object o : input) {
+			toReturn = parse(o);
+		}
+		toReturn += "e";
+		return toReturn;
+	}
+	
+	private static String parseDict(Map<String, Object> input) {
+		String toReturn = "d";
+		Set<String> keys = input.keySet();
+		for(String k : keys) {
+			toReturn += parseString(k);
+			toReturn += parse(input.get(k));
+		}
+		toReturn += "e";
+		return toReturn ;
+	}
+	
 	public static Object unparse(String input)
 	{
 		switch (input.charAt(0))
