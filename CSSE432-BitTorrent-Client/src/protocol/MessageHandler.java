@@ -87,8 +87,49 @@ public class MessageHandler
 		return peerId;
 	}
 	
-	public static Message readMessage(InputStream input) {
+	public static Message readMessage(InputStream input) throws IOException {
+		byte[] lengthPrefix = new byte[4];
+		input.read(lengthPrefix);
+		int messageLength = byteArrayToInt(lengthPrefix);
+		if (messageLength == 0) {
+			// Keep-alive
+			return null;
+		}
+		byte[] message = new byte[messageLength];
+		input.read(message);
+		switch(message[0]) {
+		case 0:
+			return new ChokeMessage();
+		case 1:
+			return new UnchokeMessage();
+		case 2:
+			return new InterestedMessage();
+		case 3:
+			return new NotInterestedMessage();
+		case 4:
+			return new HaveMessage(message);
+		case 5:
+			return new BitfieldMessage(message);
+		case 6:
+			return new RequestMessage(message);
+		case 7:
+			return new PieceMessage(message);
+		case 8:
+			return new CancelMessage(message);
+		default:
+			break;
+		}
 		return null;
+	}
+	
+	private static int byteArrayToInt(byte[] b) 
+	{
+	    int value = 0;
+	    for (int i = 0; i < 4; i++) {
+	        int shift = (4 - 1 - i) * 8;
+	        value += (b[i] & 0x000000FF) << shift;
+	    }
+	    return value;
 	}
 	
 }
