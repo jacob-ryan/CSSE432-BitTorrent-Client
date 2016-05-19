@@ -1,6 +1,7 @@
 package protocol;
 
-public abstract class Message {
+import java.io.OutputStream;
 
-	public abstract void handleMessage();
+public abstract class Message {
+	public abstract void sendMessage(OutputStream out);
 }

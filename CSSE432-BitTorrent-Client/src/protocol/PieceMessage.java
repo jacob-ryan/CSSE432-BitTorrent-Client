@@ -4,19 +4,20 @@ import java.io.OutputStream;
 
 public class PieceMessage extends Message {
 
-	public PieceMessage(byte[] message) {
-		
+	private int index;
+	private int begin;
+	private byte[] piece;
+	
+	public PieceMessage(int index, int begin, byte[] piece) {
+		this.index = index;
+		this.begin = begin;
+		this.piece = piece;
 	}
-
-	public static void sendMessage(OutputStream out, int index, int begin, byte[] piece) {
-
-	}
-
 	
 	@Override
-	public void handleMessage() {
-		// TODO Auto-generated method stub
+	public void sendMessage(OutputStream out) {
 		
 	}
+
 
 }

@@ -4,18 +4,16 @@ import java.io.OutputStream;
 
 public class HaveMessage extends Message {
 
-	public HaveMessage(byte[] payload) {
-
-	}
-
-	public static void sendMessage(OutputStream out, int dwnldrIndex) {
-
+	private int dwnldrIndex;
+	
+	public HaveMessage(int dwnldrIndex) {
+		this.dwnldrIndex = dwnldrIndex;
 	}
 
 	@Override
-	public void handleMessage() {
-		// TODO Auto-generated method stub
-		
+	public void sendMessage(OutputStream out) {
+
 	}
+
 
 }

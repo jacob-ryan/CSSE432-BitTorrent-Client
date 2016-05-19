@@ -4,17 +4,15 @@ import java.io.OutputStream;
 
 public class BitfieldMessage extends Message {
 
-	public BitfieldMessage(byte[] message) {
-		
+	private byte[] bitfield;
+	
+	public BitfieldMessage(byte[] bitfield) {
+		this.bitfield = bitfield;
 	}
 	
-	public static void sendMessage(OutputStream out, byte[] bitfield) {
+	@Override
+	public void sendMessage(OutputStream out) {
 		
 	}
 
-	@Override
-	public void handleMessage() {
-		// TODO Auto-generated method stub
-		
-	}
 }

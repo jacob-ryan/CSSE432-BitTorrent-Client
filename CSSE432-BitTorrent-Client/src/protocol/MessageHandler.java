@@ -95,9 +95,11 @@ public class MessageHandler
 			// Keep-alive
 			return null;
 		}
-		byte[] message = new byte[messageLength];
-		input.read(message);
-		switch(message[0]) {
+		byte[] messageType = new byte[1];
+		input.read(messageType);
+		byte[] payload = new byte[messageLength-1];
+		input.read(payload);
+		switch(messageType[0]) {
 		case 0:
 			return new ChokeMessage();
 		case 1:
@@ -107,15 +109,25 @@ public class MessageHandler
 		case 3:
 			return new NotInterestedMessage();
 		case 4:
-			return new HaveMessage(message);
+			int dwnldrIndex = byteArrayToInt(payload);
+			return new HaveMessage(dwnldrIndex);
 		case 5:
-			return new BitfieldMessage(message);
+			return new BitfieldMessage(payload);
 		case 6:
-			return new RequestMessage(message);
+			int rIndex = payload[0];
+			int rBegin = payload[1];
+			int rLength = byteArrayToInt(Arrays.copyOfRange(payload, 2, payload.length));
+			return new RequestMessage(rIndex, rBegin, rLength);
 		case 7:
-			return new PieceMessage(message);
+			int index = payload[0];
+			int begin = payload[1];
+			byte[] piece = Arrays.copyOfRange(payload, 2, payload.length);
+			return new PieceMessage(index, begin, piece);
 		case 8:
-			return new CancelMessage(message);
+			int cIndex = payload[0];
+			int cBegin = payload[1];
+			int cLength = byteArrayToInt(Arrays.copyOfRange(payload, 2, payload.length));
+			return new CancelMessage(cIndex, cBegin, cLength);
 		default:
 			break;
 		}

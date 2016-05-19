@@ -4,18 +4,18 @@ import java.io.OutputStream;
 
 public class RequestMessage extends Message {
 
-	public RequestMessage(byte[] message) {
-
-	}
-
-	public static void sendMessage(OutputStream out, int index, int begin, int length) {
-
+	private int index;
+	private int begin;
+	private int length;
+	
+	public RequestMessage(int index, int begin, int length) {
+		this.index = index;
+		this.begin = begin;
+		this.length = length;
 	}
 
 	@Override
-	public void handleMessage() {
-		// TODO Auto-generated method stub
+	public void sendMessage(OutputStream out) {
 
 	}
-
 }

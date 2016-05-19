@@ -4,17 +4,18 @@ import java.io.OutputStream;
 
 public class CancelMessage extends Message {
 
-	public CancelMessage(byte[] message) {
-
-	}
-
-	public static void sendMessage(OutputStream out, int index, int begin, int length) {
-
+	private int index;
+	private int begin;
+	private int length;
+	
+	public CancelMessage(int index, int begin, int length) {
+		this.index = index;
+		this.begin = begin;
+		this.length = length;
 	}
 
 	@Override
-	public void handleMessage() {
-		// TODO Auto-generated method stub
+	public void sendMessage(OutputStream out) {
 
 	}
 
