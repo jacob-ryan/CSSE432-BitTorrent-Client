@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.net.*;
 
+import gui.*;
 import main.*;
 import protocol.*;
 
@@ -15,7 +16,7 @@ public class Connection
 	private OutputStream outputStream;
 	private boolean choked;
 	private boolean interested;
-	private byte[] pieceBitfield;
+	private byte[] remoteBitfield;
 	private ConnectionWriter connectionWriter;
 	private ConnectionReader connectionReader;
 	
@@ -127,12 +128,12 @@ public class Connection
 	
 	public byte[] getPieceBitfield()
 	{
-		return this.pieceBitfield;
+		return this.remoteBitfield;
 	}
 	
 	public void setPieceBitfield(byte[] bitfield)
 	{
-		this.pieceBitfield = bitfield;
+		this.remoteBitfield = bitfield;
 	}
 	
 	public ConnectionWriter getConnectionWriter()
@@ -143,6 +144,20 @@ public class Connection
 	public ConnectionReader getConnectionReader()
 	{
 		return this.connectionReader;
+	}
+	
+	public void connectionError(IOException e)
+	{
+		LoggingPanel.log("[Connection] An error occurred, closing connection: " + e.toString());
+		this.peerManager.removeConnection(this);
+		try
+		{
+			this.socket.close();
+		}
+		catch (IOException ee)
+		{
+			ee.printStackTrace();
+		}
 	}
 	
 	private void finishInit()

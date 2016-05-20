@@ -1,5 +1,6 @@
 package network;
 
+import java.io.*;
 import java.util.*;
 
 import protocol.*;
@@ -61,29 +62,41 @@ public class ConnectionWriter extends Thread
 	
 	public void run()
 	{
-		while (true)
+		try
 		{
-			Message toSend = null;
-			synchronized (this.lock)
+			// Fully connected to peer (handshake sent/read and verified).
+			// Must first send our piece bitfield to the peer.
+			BitfieldMessage bm = new BitfieldMessage(this.connection.getTorrent().getPieceBitfield());
+			bm.sendMessage(this.connection.getOutputStream());
+			
+			while (true)
 			{
-				try
+				Message toSend = null;
+				synchronized (this.lock)
 				{
-					this.lock.wait(60 * 1000);
+					try
+					{
+						this.lock.wait(60 * 1000);
+					}
+					catch (InterruptedException e)
+					{
+						// Timed out, need to send KeepaliveMessage.
+						this.queue.addFirst(new KeepaliveMessage());
+					}
+					if (this.queue.size() > 0)
+					{
+						toSend = this.queue.removeFirst();
+					}
 				}
-				catch (InterruptedException e)
+				if (toSend != null)
 				{
-					// Timed out, need to send KeepaliveMessage.
-					this.queue.addFirst(new KeepAliveMessage());
-				}
-				if (this.queue.size() > 0)
-				{
-					toSend = this.queue.removeFirst();
+					toSend.sendMessage(this.connection.getOutputStream());
 				}
 			}
-			if (toSend != null)
-			{
-				toSend.sendMessage(this.connection.getOutputStream());
-			}
+		}
+		catch (IOException e)
+		{
+			this.connection.connectionError(e);
 		}
 	}
 }

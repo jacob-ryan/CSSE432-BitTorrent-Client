@@ -4,6 +4,7 @@ import java.util.*;
 
 import gui.*;
 import main.*;
+import protocol.*;
 
 public class PeerManager extends Thread
 {
@@ -11,6 +12,8 @@ public class PeerManager extends Thread
 	private byte[] peerId;
 	private ConnectionListener connectionListener;
 	private List<Connection> connections;
+	private List<RequestMessage> outstandingChunks;
+	private List<RequestMessage> completedChunks;
 	
 	public PeerManager(Torrent torrent)
 	{
@@ -18,6 +21,8 @@ public class PeerManager extends Thread
 		this.peerId = generatePeerId();
 		this.connectionListener = new ConnectionListener(this);
 		this.connections = new ArrayList<Connection>();
+		this.outstandingChunks = new ArrayList<RequestMessage>();
+		this.completedChunks = new ArrayList<RequestMessage>();
 		
 		this.start();
 	}
@@ -35,6 +40,11 @@ public class PeerManager extends Thread
 	public synchronized void addConnection(Connection connection)
 	{
 		this.connections.add(connection);
+	}
+	
+	public synchronized void removeConnection(Connection connection)
+	{
+		this.connections.remove(connection);
 	}
 	
 	public void run()
