@@ -36,7 +36,7 @@ public class ButtonPanel extends JPanel
 			{
 				String port = JOptionPane.showInputDialog("Enter peer port:");
 				String peerId = JOptionPane.showInputDialog("Enter peer ID:");
-				PeerInfo test = new PeerInfo(peerId.getBytes(), "127.0.0.1", Integer.parseInt(port));
+				PeerInfo test = new PeerInfo(peerId.getBytes(), JOptionPane.showInputDialog("Enter peer IP:"), Integer.parseInt(port));
 				
 				Torrent torrent = TorrentManager.getInstance().getTorrents().get(0);
 				Connection connection;
