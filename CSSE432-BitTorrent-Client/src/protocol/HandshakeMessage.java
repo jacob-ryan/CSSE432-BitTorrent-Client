@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
-public class MessageHandler
+public class HandshakeMessage
 {
 	public static void writeHandshake(OutputStream output, byte[] infoHash, byte[] peerId) throws IOException
 	{
@@ -87,9 +87,7 @@ public class MessageHandler
 		return peerId;
 	}
 	
-	public static Message readMessage(InputStream input) {
-		return null;
-	}
+	
 	
 }
 

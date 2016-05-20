@@ -43,6 +43,7 @@ public class PeerManager extends Thread
 		//while (true)
 		{
 			// Need to get updated PeerInfo's from trackers.
+			// Then try connecting to new peers if we have less than (say) 10 connections.
 		}
 	}
 	

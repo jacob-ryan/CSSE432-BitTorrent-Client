@@ -60,12 +60,7 @@ public class TorrentListModel extends AbstractTableModel
 		}
 		if (col == 1)
 		{
-			long size = 0;
-			for (int i = 0; i < torrent.getNumFiles(); i += 1)
-			{
-				size += torrent.getFileLength(i);
-			}
-			return "  " + size + " B";
+			return "  " + torrent.getFileLength() + " B";
 		}
 		if (col == 2)
 		{

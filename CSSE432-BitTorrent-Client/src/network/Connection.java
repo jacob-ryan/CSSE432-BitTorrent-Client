@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.net.*;
 
+import main.*;
 import protocol.*;
 
 public class Connection
@@ -14,6 +15,9 @@ public class Connection
 	private OutputStream outputStream;
 	private boolean choked;
 	private boolean interested;
+	private byte[] pieceBitfield;
+	private ConnectionWriter connectionWriter;
+	private ConnectionReader connectionReader;
 	
 	private Connection(PeerManager peerManager)
 	{
@@ -34,14 +38,16 @@ public class Connection
 			this.outputStream = this.socket.getOutputStream();
 			
 			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			MessageHandler.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
 			
-			if (!MessageHandler.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
+			if (!HandshakeMessage.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
 			{
 				// Invalid handshake, forcefully terminate connection.
 				this.socket.close();
 				throw new IOException("Invalid handshake received from remote peer.");
 			}
+			
+			finishInit();
 		}
 		catch (IOException e)
 		{
@@ -61,7 +67,7 @@ public class Connection
 			this.outputStream = this.socket.getOutputStream();
 			
 			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			this.peerInfo.id = MessageHandler.readHandshake(this.inputStream, infoHash);
+			this.peerInfo.id = HandshakeMessage.readHandshake(this.inputStream, infoHash);
 			if (this.peerInfo.id == null)
 			{
 				// Invalid handshake, forcefully terminate connection.
@@ -69,7 +75,9 @@ public class Connection
 				throw new IOException("Invalid handshake received from remote peer.");
 			}
 			
-			MessageHandler.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			
+			finishInit();
 		}
 		catch (IOException e)
 		{
@@ -77,8 +85,69 @@ public class Connection
 		}
 	}
 	
+	public Torrent getTorrent()
+	{
+		return this.peerManager.getTorrent();
+	}
+	
 	public PeerInfo getPeerInfo()
 	{
 		return this.peerInfo;
+	}
+	
+	public InputStream getInputStream()
+	{
+		return this.inputStream;
+	}
+	
+	public OutputStream getOutputStream()
+	{
+		return this.outputStream;
+	}
+	
+	public boolean getChoked()
+	{
+		return this.choked;
+	}
+	
+	public void setChoked(boolean choked)
+	{
+		this.choked = choked;
+	}
+	
+	public boolean getInterested()
+	{
+		return this.interested;
+	}
+	
+	public void setInterested(boolean interested)
+	{
+		this.interested = interested;
+	}
+	
+	public byte[] getPieceBitfield()
+	{
+		return this.pieceBitfield;
+	}
+	
+	public void setPieceBitfield(byte[] bitfield)
+	{
+		this.pieceBitfield = bitfield;
+	}
+	
+	public ConnectionWriter getConnectionWriter()
+	{
+		return this.connectionWriter;
+	}
+	
+	public ConnectionReader getConnectionReader()
+	{
+		return this.connectionReader;
+	}
+	
+	private void finishInit()
+	{
+		this.connectionWriter = new ConnectionWriter(this);
+		this.connectionReader = new ConnectionReader(this);
 	}
 }
