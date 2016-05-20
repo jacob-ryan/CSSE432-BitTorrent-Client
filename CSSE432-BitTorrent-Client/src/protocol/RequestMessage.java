@@ -17,8 +17,8 @@ public class RequestMessage extends Message {
 
 	private byte[] makePayload() {
 		byte[] indexByteArr = intToByteArray(index, 4);
-		byte[] beginByteArr = intToByteArray(index, 4);
-		byte[] lengthByteArr = intToByteArray(index, 2 << 13);
+		byte[] beginByteArr = intToByteArray(begin, 4);
+		byte[] lengthByteArr = intToByteArray(length, 4);
 		byte[] payload = new byte[indexByteArr.length + beginByteArr.length + lengthByteArr.length];
 		int payloadIndex = 0;
 		for (int i = 0; i < 4; i++) {
@@ -29,7 +29,7 @@ public class RequestMessage extends Message {
 			payload[payloadIndex] = beginByteArr[j];
 			payloadIndex++;
 		}
-		for (int k = 0; k < lengthByteArr.length; k++) {
+		for (int k = 0; k < 4; k++) {
 			payload[payloadIndex] = lengthByteArr[k];
 			payloadIndex++;
 		}
@@ -39,10 +39,8 @@ public class RequestMessage extends Message {
 	@Override
 	public void sendMessage(OutputStream out) throws IOException {
 		byte[] payload = makePayload();
-		byte[] messageType = new byte[1];
-		messageType[0] = 6;
-		out.write(messageType.length + payload.length);
-		out.write(messageType);
+		out.write(intToByteArray(1 + payload.length, 4));
+		out.write(6);
 		out.write(payload);
 	}
 }

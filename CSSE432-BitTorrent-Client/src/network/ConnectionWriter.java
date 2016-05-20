@@ -1,7 +1,9 @@
 package network;
 
+import java.io.*;
 import java.util.*;
 
+import filesystem.*;
 import protocol.*;
 
 public class ConnectionWriter extends Thread
@@ -28,15 +30,10 @@ public class ConnectionWriter extends Thread
 	
 	public void handleRequestMessage(RequestMessage rm)
 	{
-		byte[] pieceData = FileManager.readData(this.connection.getTorrent().getFileName(), rm.index, rm.begin, rm.length);
+		String fileName = this.connection.getPeerManager().getTorrent().getFileName();
+		byte[] pieceData = FileManager.readData(fileName, rm.index, rm.begin, rm.length);
 		PieceMessage pm = new PieceMessage(rm.index, rm.begin, pieceData);
 		queueMessage(pm);
-	}
-	
-	public void handlePieceMessage(PieceMessage pm)
-	{
-		HaveMessage hm = new HaveMessage(pm.index);
-		queueMessage(hm);
 	}
 	
 	public void handleCancelMessage(CancelMessage cm)
@@ -61,29 +58,49 @@ public class ConnectionWriter extends Thread
 	
 	public void run()
 	{
-		while (true)
+		try
 		{
-			Message toSend = null;
-			synchronized (this.lock)
+			// Fully connected to peer (handshake sent/read and verified).
+			// Must first send our piece bitfield to the peer.
+			byte[] bitfield = this.connection.getPeerManager().getTorrent().getPieceBitfield();
+			BitfieldMessage bm = new BitfieldMessage(bitfield);
+			bm.sendMessage(this.connection.getOutputStream());
+			
+			while (true)
 			{
-				try
+				Message toSend = null;
+				synchronized (this.lock)
 				{
-					this.lock.wait(60 * 1000);
+					try
+					{
+						this.lock.wait(60 * 1000);
+					}
+					catch (InterruptedException e)
+					{
+						// Timed out, need to send KeepaliveMessage.
+						this.queue.addFirst(new KeepaliveMessage());
+					}
+					if (this.queue.size() > 0)
+					{
+						toSend = this.queue.removeFirst();
+					}
 				}
-				catch (InterruptedException e)
+				if (toSend != null)
 				{
-					// Timed out, need to send KeepaliveMessage.
-					this.queue.addFirst(new KeepAliveMessage());
-				}
-				if (this.queue.size() > 0)
-				{
-					toSend = this.queue.removeFirst();
+					toSend.sendMessage(this.connection.getOutputStream());
+					System.out.println("[ConnectionWriter] Wrote message of type " + toSend.getClass());
+					// Keep track of all outstanding chunk requests.
+					if (toSend instanceof RequestMessage)
+					{
+						RequestMessage rm = (RequestMessage) toSend;
+						this.connection.getPeerManager().addOutstandingChunk(rm);
+					}
 				}
 			}
-			if (toSend != null)
-			{
-				toSend.sendMessage(this.connection.getOutputStream());
-			}
+		}
+		catch (IOException e)
+		{
+			this.connection.connectionError(e);
 		}
 	}
 }

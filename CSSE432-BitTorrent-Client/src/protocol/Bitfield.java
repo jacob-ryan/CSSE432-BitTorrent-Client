@@ -1,10 +1,12 @@
 package protocol;
 
+import main.*;
+
 public class Bitfield
 {
-	public static byte[] make(long fileLength)
+	public static byte[] make(Torrent torrent)
 	{
-		int numPieces = (int) Math.ceil((double) fileLength / (2 >> 18));
+		int numPieces = torrent.getNumberOfPieces();
 		int length = (int) Math.ceil(numPieces / 8.0);
 		return new byte[length];
 	}

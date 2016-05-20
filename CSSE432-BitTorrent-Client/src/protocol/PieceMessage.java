@@ -38,10 +38,8 @@ public class PieceMessage extends Message {
 	@Override
 	public void sendMessage(OutputStream out) throws IOException {
 		byte[] payload = makePayload();
-		byte[] messageType = new byte[1];
-		messageType[0] = 7;
-		out.write(messageType.length + payload.length);
-		out.write(messageType);
+		out.write(intToByteArray(1 + payload.length, 4));
+		out.write(7);
 		out.write(payload);
 	}
 

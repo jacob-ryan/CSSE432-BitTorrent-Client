@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import main.*;
+import protocol.*;
 
 public class TorrentListModel extends AbstractTableModel
 {
@@ -64,7 +65,16 @@ public class TorrentListModel extends AbstractTableModel
 		}
 		if (col == 2)
 		{
-			return "  " + "Unknown";
+			int complete = 0;
+			for (int i = 0; i < torrent.getNumberOfPieces(); i += 1)
+			{
+				if (Bitfield.getPiece(torrent.getPieceBitfield(), i))
+				{
+					complete += 1;
+				}
+			}
+			double progress = (double) complete / torrent.getNumberOfPieces() * 100;
+			return "  " + progress + "%";
 		}
 		return "";
 	}

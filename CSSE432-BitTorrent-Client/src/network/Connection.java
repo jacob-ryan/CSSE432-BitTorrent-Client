@@ -3,7 +3,7 @@ package network;
 import java.io.*;
 import java.net.*;
 
-import main.*;
+import gui.*;
 import protocol.*;
 
 public class Connection
@@ -15,7 +15,7 @@ public class Connection
 	private OutputStream outputStream;
 	private boolean choked;
 	private boolean interested;
-	private byte[] pieceBitfield;
+	private byte[] remoteBitfield;
 	private ConnectionWriter connectionWriter;
 	private ConnectionReader connectionReader;
 	
@@ -26,68 +26,54 @@ public class Connection
 		this.interested = false;
 	}
 	
-	public Connection(PeerManager peerManager, PeerInfo peerInfo)
+	public Connection(PeerManager peerManager, PeerInfo peerInfo) throws IOException
 	{
 		this(peerManager);
 		this.peerInfo = peerInfo;
 		
-		try
+		this.socket = new Socket(this.peerInfo.ip, this.peerInfo.port);
+		this.inputStream = this.socket.getInputStream();
+		this.outputStream = this.socket.getOutputStream();
+		
+		byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
+		HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+		
+		if (!HandshakeMessage.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
 		{
-			this.socket = new Socket(this.peerInfo.ip, this.peerInfo.port);
-			this.inputStream = this.socket.getInputStream();
-			this.outputStream = this.socket.getOutputStream();
-			
-			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
-			
-			if (!HandshakeMessage.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
-			{
-				// Invalid handshake, forcefully terminate connection.
-				this.socket.close();
-				throw new IOException("Invalid handshake received from remote peer.");
-			}
-			
-			finishInit();
+			// Invalid handshake, forcefully terminate connection.
+			this.socket.close();
+			throw new IOException("Invalid handshake received from remote peer.");
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		
+		finishInit();
 	}
 	
-	public Connection(PeerManager peerManager, Socket socket)
+	public Connection(PeerManager peerManager, Socket socket) throws IOException
 	{
 		this(peerManager);
 		this.peerInfo = new PeerInfo(null, socket.getInetAddress().getHostAddress(), socket.getPort());
 		
-		try
+		this.socket = socket;
+		this.inputStream = this.socket.getInputStream();
+		this.outputStream = this.socket.getOutputStream();
+		
+		byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
+		this.peerInfo.id = HandshakeMessage.readHandshake(this.inputStream, infoHash);
+		if (this.peerInfo.id == null)
 		{
-			this.socket = socket;
-			this.inputStream = this.socket.getInputStream();
-			this.outputStream = this.socket.getOutputStream();
-			
-			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			this.peerInfo.id = HandshakeMessage.readHandshake(this.inputStream, infoHash);
-			if (this.peerInfo.id == null)
-			{
-				// Invalid handshake, forcefully terminate connection.
-				this.socket.close();
-				throw new IOException("Invalid handshake received from remote peer.");
-			}
-			
-			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
-			
-			finishInit();
+			// Invalid handshake, forcefully terminate connection.
+			this.socket.close();
+			throw new IOException("Invalid handshake received from remote peer.");
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		
+		HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+		
+		finishInit();
 	}
 	
-	public Torrent getTorrent()
+	public PeerManager getPeerManager()
 	{
-		return this.peerManager.getTorrent();
+		return this.peerManager;
 	}
 	
 	public PeerInfo getPeerInfo()
@@ -127,12 +113,12 @@ public class Connection
 	
 	public byte[] getPieceBitfield()
 	{
-		return this.pieceBitfield;
+		return this.remoteBitfield;
 	}
 	
 	public void setPieceBitfield(byte[] bitfield)
 	{
-		this.pieceBitfield = bitfield;
+		this.remoteBitfield = bitfield;
 	}
 	
 	public ConnectionWriter getConnectionWriter()
@@ -143,6 +129,20 @@ public class Connection
 	public ConnectionReader getConnectionReader()
 	{
 		return this.connectionReader;
+	}
+	
+	public void connectionError(IOException e)
+	{
+		LoggingPanel.log("[Connection] An error occurred, closing connection: " + e.toString());
+		this.peerManager.removeConnection(this);
+		try
+		{
+			this.socket.close();
+		}
+		catch (IOException ee)
+		{
+			ee.printStackTrace();
+		}
 	}
 	
 	private void finishInit()

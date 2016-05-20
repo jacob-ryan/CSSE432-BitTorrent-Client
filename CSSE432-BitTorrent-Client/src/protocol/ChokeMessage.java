@@ -7,10 +7,8 @@ public class ChokeMessage extends Message {
 
 	@Override
 	public void sendMessage(OutputStream out) throws IOException {
-		byte[] message = new byte[1];
-		message[0] = 0;
-		out.write(message.length);
-		out.write(message);
+		out.write(intToByteArray(1, 4));
+		out.write(0);
 	}
 
 	
