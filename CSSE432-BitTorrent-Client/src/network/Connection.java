@@ -16,6 +16,8 @@ public class Connection
 	private boolean choked;
 	private boolean interested;
 	private byte[] pieceBitfield;
+	private ConnectionWriter connectionWriter;
+	private ConnectionReader connectionReader;
 	
 	private Connection(PeerManager peerManager)
 	{
@@ -83,6 +85,11 @@ public class Connection
 		}
 	}
 	
+	public Torrent getTorrent()
+	{
+		return this.peerManager.getTorrent();
+	}
+	
 	public PeerInfo getPeerInfo()
 	{
 		return this.peerInfo;
@@ -98,9 +105,19 @@ public class Connection
 		return this.outputStream;
 	}
 	
+	public boolean getChoked()
+	{
+		return this.choked;
+	}
+	
 	public void setChoked(boolean choked)
 	{
 		this.choked = choked;
+	}
+	
+	public boolean getInterested()
+	{
+		return this.interested;
 	}
 	
 	public void setInterested(boolean interested)
@@ -118,14 +135,19 @@ public class Connection
 		this.pieceBitfield = bitfield;
 	}
 	
-	public Torrent getTorrent()
+	public ConnectionWriter getConnectionWriter()
 	{
-		return this.peerManager.getTorrent();
+		return this.connectionWriter;
+	}
+	
+	public ConnectionReader getConnectionReader()
+	{
+		return this.connectionReader;
 	}
 	
 	private void finishInit()
 	{
-		new ConnectionReader(this);
-		new ConnectionWriter(this);
+		this.connectionWriter = new ConnectionWriter(this);
+		this.connectionReader = new ConnectionReader(this);
 	}
 }
