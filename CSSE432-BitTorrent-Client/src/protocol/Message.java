@@ -8,7 +8,7 @@ import java.util.Arrays;
 public abstract class Message {
 	public abstract void sendMessage(OutputStream out) throws IOException;
 	
-	public static Message read(InputStream input) throws IOException {
+	public static Message readMessage(InputStream input) throws IOException {
 		byte[] lengthPrefix = new byte[4];
 		input.read(lengthPrefix);
 		int messageLength = byteArrayToInt(lengthPrefix);
