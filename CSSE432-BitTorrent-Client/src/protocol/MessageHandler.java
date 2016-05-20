@@ -87,62 +87,7 @@ public class MessageHandler
 		return peerId;
 	}
 	
-	public static Message readMessage(InputStream input) throws IOException {
-		byte[] lengthPrefix = new byte[4];
-		input.read(lengthPrefix);
-		int messageLength = byteArrayToInt(lengthPrefix);
-		if (messageLength == 0) {
-			// Keep-alive
-			return null;
-		}
-		byte[] messageType = new byte[1];
-		input.read(messageType);
-		byte[] payload = new byte[messageLength-1];
-		input.read(payload);
-		switch(messageType[0]) {
-		case 0:
-			return new ChokeMessage();
-		case 1:
-			return new UnchokeMessage();
-		case 2:
-			return new InterestedMessage();
-		case 3:
-			return new NotInterestedMessage();
-		case 4:
-			int dwnldrIndex = byteArrayToInt(payload);
-			return new HaveMessage(dwnldrIndex);
-		case 5:
-			return new BitfieldMessage(payload);
-		case 6:
-			int rIndex = payload[0];
-			int rBegin = payload[1];
-			int rLength = byteArrayToInt(Arrays.copyOfRange(payload, 2, payload.length));
-			return new RequestMessage(rIndex, rBegin, rLength);
-		case 7:
-			int index = payload[0];
-			int begin = payload[1];
-			byte[] piece = Arrays.copyOfRange(payload, 2, payload.length);
-			return new PieceMessage(index, begin, piece);
-		case 8:
-			int cIndex = payload[0];
-			int cBegin = payload[1];
-			int cLength = byteArrayToInt(Arrays.copyOfRange(payload, 2, payload.length));
-			return new CancelMessage(cIndex, cBegin, cLength);
-		default:
-			break;
-		}
-		return null;
-	}
 	
-	private static int byteArrayToInt(byte[] b) 
-	{
-	    int value = 0;
-	    for (int i = 0; i < 4; i++) {
-	        int shift = (4 - 1 - i) * 8;
-	        value += (b[i] & 0x000000FF) << shift;
-	    }
-	    return value;
-	}
 	
 }
 
