@@ -39,13 +39,11 @@ public class CancelMessage extends Message {
 	@Override
 	public void sendMessage(OutputStream out) throws IOException {
 		byte[] payload = makePayload();
-		byte[] message = new byte[payload.length + 1];
-		message[0] = 8;
-		for (int i = 0; i < payload.length; i++) {
-			message[i + 1] = payload[i];
-		}
-		out.write(message.length);
-		out.write(message);
+		byte[] messageType = new byte[1];
+		messageType[0] = 8;
+		out.write(messageType.length + payload.length);
+		out.write(messageType);
+		out.write(payload);
 	}
 
 }

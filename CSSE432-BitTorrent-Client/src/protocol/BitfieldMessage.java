@@ -13,13 +13,11 @@ public class BitfieldMessage extends Message {
 	
 	@Override
 	public void sendMessage(OutputStream out) throws IOException {
-		byte[] message = new byte[bitfield.length+1];
-		message[0] = 5;
-		for(int i = 0; i < bitfield.length; i++) {
-			message[i+1] = bitfield[i];
-		}
-		out.write(message.length);
-		out.write(message);
+		byte[] messageType = new byte[1];
+		messageType[0] = 5;
+		out.write(messageType.length + this.bitfield.length);
+		out.write(messageType);
+		out.write(this.bitfield);
 	}
 
 }
