@@ -32,9 +32,9 @@ public class BEncode
 
 	private static String parseInt(Integer input) {
 		String toReturn = "i";
-		if(input < 0) {
-			toReturn += "-";
-		}
+		//if(input < 0) {
+		//	toReturn += "-";
+		//}
 		toReturn += input.toString() + "e";
 		System.out.println("Integer Parse: " + toReturn);
 		return toReturn;
@@ -43,7 +43,7 @@ public class BEncode
 	private static String parseList(List<Object> input) {
 		String toReturn = "l";
 		for(Object o : input) {
-			toReturn = parse(o);
+			toReturn += parse(o);
 		}
 		toReturn += "e";
 		System.out.println("List Parse: " + toReturn);
@@ -103,15 +103,16 @@ public class BEncode
 
 	private static int intUnparse(String input)
 	{
-		String value = input.substring(1, input.length() - 1);
+		String value = input.substring(0, input.length() - 1);
 		if (value.charAt(0) == '0' && value.length() != 1)
 		{
 			// Error, leading zeros
-
+			System.out.println("Invalid integer input");
 		}
 		if (value.length() > 1 && value.charAt(0) == '-' && value.charAt(1) == '0')
 		{
 			// Error, invalid input
+			System.out.println("Invalid integer input");
 		}
 		System.out.println("Integer Unparse: " + value);
 		return Integer.parseInt(value);
@@ -129,7 +130,7 @@ public class BEncode
 	{
 		List<Object> newList = new ArrayList<Object>();
 		String currString = input;
-		while(currString != "e") {
+		while(!currString.equals("e")) {
 			Object item;
 			int itemLength = 0;
 			if(currString.charAt(0) == 'i') {
@@ -151,7 +152,7 @@ public class BEncode
 	{
 		Map<String, Object> newDict = new HashMap<String,Object>();
 		String currString = input;
-		while(currString != "e") {
+		while(!currString.equals("e")) {
 			Object value;
 			int valLength = 0;
 			int keyLength = Integer.parseInt(currString.charAt(0) + "");
@@ -159,11 +160,11 @@ public class BEncode
 			currString = currString.substring(keyLength+2);
 			if(currString.charAt(0) == 'i') {
 				String intString = extractObj(currString);
-				value = intUnparse(intString);
+				value = intUnparse(intString.substring(1));
 				valLength = intString.length();
 			} else if (currString.charAt(0) == 'l') {
 				String listString = extractObj(currString);
-				value = listUnparse(listString);
+				value = listUnparse(listString.substring(1));
 				valLength = listString.length();
 			} else {
 				valLength = Integer.parseInt(currString.charAt(0) + "")+2;
