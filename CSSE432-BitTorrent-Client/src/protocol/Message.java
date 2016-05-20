@@ -14,7 +14,7 @@ public abstract class Message {
 		int messageLength = byteArrayToInt(lengthPrefix);
 		if (messageLength == 0) {
 			// Keep-alive
-			return null;
+			return new KeepaliveMessage();
 		}
 		byte[] messageType = new byte[1];
 		input.read(messageType);
@@ -50,9 +50,8 @@ public abstract class Message {
 			int cLength = byteArrayToInt(Arrays.copyOfRange(payload, 8, payload.length));
 			return new CancelMessage(cIndex, cBegin, cLength);
 		default:
-			break;
+			throw new IOException("Unknown Message Type");
 		}
-		return null;
 	}
 	
 	public static byte[] intToByteArray(int a, int arraySize)

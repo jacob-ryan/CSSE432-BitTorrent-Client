@@ -36,9 +36,9 @@ public class Connection
 			this.outputStream = this.socket.getOutputStream();
 			
 			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			MessageHandler.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
 			
-			if (!MessageHandler.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
+			if (!HandshakeMessage.verifyHandshake(this.inputStream, infoHash, this.peerInfo.id))
 			{
 				// Invalid handshake, forcefully terminate connection.
 				this.socket.close();
@@ -65,7 +65,7 @@ public class Connection
 			this.outputStream = this.socket.getOutputStream();
 			
 			byte[] infoHash = this.peerManager.getTorrent().getInfoHash();
-			this.peerInfo.id = MessageHandler.readHandshake(this.inputStream, infoHash);
+			this.peerInfo.id = HandshakeMessage.readHandshake(this.inputStream, infoHash);
 			if (this.peerInfo.id == null)
 			{
 				// Invalid handshake, forcefully terminate connection.
@@ -73,7 +73,7 @@ public class Connection
 				throw new IOException("Invalid handshake received from remote peer.");
 			}
 			
-			MessageHandler.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			HandshakeMessage.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
 			
 			finishInit();
 		}
