@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 
 import gui.*;
-import main.*;
 import protocol.*;
 
 public class Connection
@@ -86,9 +85,9 @@ public class Connection
 		}
 	}
 	
-	public Torrent getTorrent()
+	public PeerManager getPeerManager()
 	{
-		return this.peerManager.getTorrent();
+		return this.peerManager;
 	}
 	
 	public PeerInfo getPeerInfo()

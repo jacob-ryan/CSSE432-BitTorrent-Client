@@ -7,6 +7,7 @@ import protocol.*;
 
 public class Torrent
 {
+	public static final int PIECE_LENGTH = 2 >> 18;
 	private String name;
 	private int pieceLength;
 	private List<String> trackers;
@@ -69,7 +70,7 @@ public class Torrent
 		this.fileName = name;
 		this.fileLength = length;
 		this.pieceHashes.add(null);
-		this.pieceBitfield = Bitfield.make(this.fileLength);
+		this.pieceBitfield = Bitfield.make(this);
 	}
 	
 	public byte[] getInfoHash()
@@ -80,5 +81,10 @@ public class Torrent
 	public PeerManager getPeerManager()
 	{
 		return this.peerManager;
+	}
+	
+	public int getNumberOfPieces()
+	{
+		return (int) Math.ceil((double) this.fileLength / Torrent.PIECE_LENGTH);
 	}
 }

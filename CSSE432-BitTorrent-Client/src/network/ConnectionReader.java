@@ -66,12 +66,10 @@ public class ConnectionReader extends Thread
 				if (m instanceof PieceMessage)
 				{
 					PieceMessage pm = (PieceMessage) m;
-					FileManager.writeData(this.connection.getTorrent().getFileName(), pm.index, pm.begin, pm.piece);
+					String fileName = this.connection.getPeerManager().getTorrent().getFileName();
+					FileManager.writeData(fileName, pm.index, pm.begin, pm.piece);
 					
-					// DON'T KNOW if we have whole piece yet, TODO???
-					//Bitfield.setPiece(this.connection.getTorrent().getPieceBitfield(), pm.index);
-					// Queue announcement that we have received a piece.
-					//this.connection.getConnectionWriter().handlePieceMessage(pm);
+					this.connection.getPeerManager().markChunkCompleted(pm);
 				}
 				if (m instanceof CancelMessage)
 				{
