@@ -17,6 +17,14 @@ public class Torrent
 	private byte[] pieceBitfield;
 	private PeerManager peerManager;
 	
+	public void markSeeder()
+	{
+		for (int i = 0; i < this.pieceBitfield.length; i += 1)
+		{
+			this.pieceBitfield[i] = (byte) 0xFF;
+		}
+	}
+	
 	public Torrent(String name, int pieceLength)
 	{
 		this.name = name;

@@ -33,6 +33,7 @@ public class ConnectionReader extends Thread
 			while (true)
 			{
 				m = Message.readMessage(this.connection.getInputStream());
+				System.out.println("[ConnectionReader] Read message of type " + m.getClass());
 				if (m instanceof KeepaliveMessage)
 				{
 					// Do nothing.

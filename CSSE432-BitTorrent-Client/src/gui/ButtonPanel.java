@@ -85,10 +85,17 @@ public class ButtonPanel extends JPanel
 				String peerId = JOptionPane.showInputDialog("Enter peer ID:");
 				PeerInfo test = new PeerInfo(peerId.getBytes(), "127.0.0.1", Integer.parseInt(port));
 				
-				Torrent torrent = TorrentManager.getInstance().getTorrents().get(0);
-				Connection connection = new Connection(torrent.getPeerManager(), test);
-				torrent.getPeerManager().addConnection(connection);
-				LoggingPanel.log("Successfully connected to peer!  ID = " + peerId);
+				try
+				{
+					Torrent torrent = TorrentManager.getInstance().getTorrents().get(0);
+					Connection connection = new Connection(torrent.getPeerManager(), test);
+					torrent.getPeerManager().addConnection(connection);
+					LoggingPanel.log("Successfully connected to peer!  ID = " + peerId);
+				}
+				catch (IOException ee)
+				{
+					ee.printStackTrace();
+				}
 			}
 		});
 	}

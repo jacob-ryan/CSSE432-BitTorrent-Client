@@ -1,5 +1,6 @@
 package network;
 
+import java.io.*;
 import java.util.*;
 
 import gui.*;
@@ -61,14 +62,16 @@ public class PeerManager extends Thread
 		}
 	}
 	
-	public void markChunkCompleted(PieceMessage pm)
+	public void markChunkCompleted(PieceMessage pm) throws IOException
 	{
+		System.out.println("markChunkCompleted() PieceMessage: index=" + pm.index + ", begin=" + pm.begin + ", length=" + pm.piece.length);
 		synchronized (this.outstandingChunks)
 		{
 			for (int i = 0; i < this.outstandingChunks.size(); i += 1)
 			{
 				RequestMessage rm = this.outstandingChunks.get(i);
-				if (rm.index == pm.index && rm.begin == pm.begin && rm.length == pm.piece.length)
+				System.out.println("markChunkCompleted() RequestMessage?: index=" + rm.index + ", begin=" + rm.begin + ", length=" + rm.length);
+				if (rm.index == pm.index && rm.begin == pm.begin)// && rm.length == pm.piece.length)
 				{
 					this.outstandingChunks.remove(i);
 					this.completedChunks.add(rm);
@@ -77,7 +80,7 @@ public class PeerManager extends Thread
 				}
 			}
 		}
-		throw new RuntimeException("[PeerManager] Trying to mark non-existant chunk completed.");
+		throw new IOException("[PeerManager] Trying to mark non-existant chunk completed.");
 	}
 	
 	public void run()
@@ -134,6 +137,7 @@ public class PeerManager extends Thread
 				bytesCompleted += rm.length;
 			}
 		}
+		System.out.println("checkCompletedPiece() bytesCompleted " + bytesCompleted + " =? " + Torrent.PIECE_LENGTH + " piecelength");
 		if (bytesCompleted == Torrent.PIECE_LENGTH)
 		{
 			Bitfield.setPiece(this.getTorrent().getPieceBitfield(), pm.index);
@@ -151,7 +155,7 @@ public class PeerManager extends Thread
 	
 	private void requestChunks()
 	{
-		System.out.println("[PeerManager] Looking for new chunks to request...");
+		//System.out.println("[PeerManager] Looking for new chunks to request...");
 		// Pick a random chunk to request from incomplete piece.
 		int incomplete = 0;
 		for (int i = 0; i < this.torrent.getNumberOfPieces(); i += 1)
@@ -162,7 +166,7 @@ public class PeerManager extends Thread
 			}
 		}
 		int index = (int) (Math.random() * incomplete);
-		System.out.println("Found " + incomplete + " incomplete pieces, picked " + index);
+		//System.out.println("Found " + incomplete + " incomplete pieces, picked " + index);
 		int current = 0;
 		for (int i = 0; i < this.torrent.getNumberOfPieces(); i += 1)
 		{
@@ -176,7 +180,7 @@ public class PeerManager extends Thread
 					{
 						if (Bitfield.getPiece(connection.getPieceBitfield(), index))
 						{
-							LoggingPanel.log("[PeerManager] Requesting new chunk from peer.");
+							LoggingPanel.log("[PeerManager] Requesting new chunk from peer, index = " + index);
 							connection.getConnectionWriter().queueMessage(rm);
 						}
 						else

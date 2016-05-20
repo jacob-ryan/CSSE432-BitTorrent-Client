@@ -17,8 +17,8 @@ public class RequestMessage extends Message {
 
 	private byte[] makePayload() {
 		byte[] indexByteArr = intToByteArray(index, 4);
-		byte[] beginByteArr = intToByteArray(index, 4);
-		byte[] lengthByteArr = intToByteArray(index, 4);
+		byte[] beginByteArr = intToByteArray(begin, 4);
+		byte[] lengthByteArr = intToByteArray(length, 4);
 		byte[] payload = new byte[indexByteArr.length + beginByteArr.length + lengthByteArr.length];
 		int payloadIndex = 0;
 		for (int i = 0; i < 4; i++) {
