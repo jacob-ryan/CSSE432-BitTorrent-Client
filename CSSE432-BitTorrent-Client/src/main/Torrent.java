@@ -3,15 +3,17 @@ package main;
 import java.util.*;
 
 import network.*;
+import protocol.*;
 
 public class Torrent
 {
 	private String name;
 	private int pieceLength;
 	private List<String> trackers;
-	private List<String> fileNames;
-	private List<Long> fileLengths;
-	private List<byte[]> fileHashes;
+	private String fileName;
+	private long fileLength;
+	private List<byte[]> pieceHashes;
+	private byte[] pieceBitfield;
 	private PeerManager peerManager;
 	
 	public Torrent(String name, int pieceLength)
@@ -19,9 +21,6 @@ public class Torrent
 		this.name = name;
 		this.pieceLength = pieceLength;
 		this.trackers = new ArrayList<String>();
-		this.fileNames = new ArrayList<String>();
-		this.fileLengths = new ArrayList<Long>();
-		this.fileHashes = new ArrayList<byte[]>();
 		this.peerManager = new PeerManager(this);
 	}
 	
@@ -40,24 +39,24 @@ public class Torrent
 		return this.trackers;
 	}
 	
-	public String getFileName(int i)
+	public String getFileName()
 	{
-		return this.fileNames.get(i);
+		return this.fileName;
 	}
 	
-	public long getFileLength(int i)
+	public long getFileLength()
 	{
-		return this.fileLengths.get(i);
+		return this.fileLength;
 	}
 	
-	public byte[] getFileHash(int i)
+	public byte[] getPieceHash(int piece)
 	{
-		return this.fileHashes.get(i);
+		return this.pieceHashes.get(piece);
 	}
 	
-	public int getNumFiles()
+	public byte[] getPieceBitfield()
 	{
-		return this.fileNames.size();
+		return this.pieceBitfield;
 	}
 	
 	public void addTracker(String tracker)
@@ -65,11 +64,12 @@ public class Torrent
 		this.trackers.add(tracker);
 	}
 	
-	public void addFile(String name, long length, byte[] hash)
+	public void setFile(String name, long length)
 	{
-		this.fileNames.add(name);
-		this.fileLengths.add(length);
-		this.fileHashes.add(hash);
+		this.fileName = name;
+		this.fileLength = length;
+		this.pieceHashes.add(null);
+		this.pieceBitfield = Bitfield.make(this.fileLength);
 	}
 	
 	public byte[] getInfoHash()

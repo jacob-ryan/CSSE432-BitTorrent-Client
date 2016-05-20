@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.net.*;
 
+import main.*;
 import protocol.*;
 
 public class Connection
@@ -14,6 +15,7 @@ public class Connection
 	private OutputStream outputStream;
 	private boolean choked;
 	private boolean interested;
+	private byte[] pieceBitfield;
 	
 	private Connection(PeerManager peerManager)
 	{
@@ -42,6 +44,8 @@ public class Connection
 				this.socket.close();
 				throw new IOException("Invalid handshake received from remote peer.");
 			}
+			
+			finishInit();
 		}
 		catch (IOException e)
 		{
@@ -70,6 +74,8 @@ public class Connection
 			}
 			
 			MessageHandler.writeHandshake(this.outputStream, infoHash, this.peerManager.getPeerId());
+			
+			finishInit();
 		}
 		catch (IOException e)
 		{
@@ -80,5 +86,46 @@ public class Connection
 	public PeerInfo getPeerInfo()
 	{
 		return this.peerInfo;
+	}
+	
+	public InputStream getInputStream()
+	{
+		return this.inputStream;
+	}
+	
+	public OutputStream getOutputStream()
+	{
+		return this.outputStream;
+	}
+	
+	public void setChoked(boolean choked)
+	{
+		this.choked = choked;
+	}
+	
+	public void setInterested(boolean interested)
+	{
+		this.interested = interested;
+	}
+	
+	public byte[] getPieceBitfield()
+	{
+		return this.pieceBitfield;
+	}
+	
+	public void setPieceBitfield(byte[] bitfield)
+	{
+		this.pieceBitfield = bitfield;
+	}
+	
+	public Torrent getTorrent()
+	{
+		return this.peerManager.getTorrent();
+	}
+	
+	private void finishInit()
+	{
+		new ConnectionReader(this);
+		new ConnectionWriter(this);
 	}
 }
