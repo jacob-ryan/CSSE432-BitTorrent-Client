@@ -7,7 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -22,6 +23,30 @@ public class ButtonPanel extends JPanel
 	{
 		this.setLayout(new GridLayout(1, 0, 5, 5));
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		this.addTorrentButton();
+		
+		this.add(new JButton("Remove Selected Torrent"));
+		JButton manualConnect = new JButton("Manually Connect");
+		this.add(manualConnect);
+		
+		manualConnect.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				String port = JOptionPane.showInputDialog("Enter peer port:");
+				String peerId = JOptionPane.showInputDialog("Enter peer ID:");
+				PeerInfo test = new PeerInfo(peerId.getBytes(), "127.0.0.1", Integer.parseInt(port));
+				
+				Torrent torrent = TorrentManager.getInstance().getTorrents().get(0);
+				Connection connection = new Connection(torrent.getPeerManager(), test);
+				torrent.getPeerManager().addConnection(connection);
+				LoggingPanel.log("Successfully connected to peer!  ID = " + peerId);
+			}
+		});
+	}
+	
+	private void addTorrentButton() {
 		JButton addTorrent = new JButton("Add Torrent");
 		this.add(addTorrent);
 		final JFileChooser fc = new JFileChooser();
@@ -64,31 +89,23 @@ public class ButtonPanel extends JPanel
 						String torrName = (String) infoDict.get("name");
 						int pieceLength = (Integer) infoDict.get("piece length");
 						Torrent torr = new Torrent(torrName, pieceLength);
-						
+						@SuppressWarnings("unchecked")
+						List<String> path = (List<String>) infoDict.get("path");
+						String filename = "/";
+						for(String dir : path) {
+							filename += dir + "/";
+						}
+						if(filename.length() == 1) {
+							System.err.println("Error with path.");
+							return;
+						}
+						long length = (long) infoDict.get("length");
+						torr.setFile(filename, length);
+						TorrentManager.getInstance().addTorrent(torr);
 					} else {
 						System.err.println("Could not parse file.");
 					}
 				}
-			}
-		});
-		
-		this.add(new JButton("Remove Selected Torrent"));
-		JButton manualConnect = new JButton("Manually Connect");
-		this.add(manualConnect);
-		
-		manualConnect.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				String port = JOptionPane.showInputDialog("Enter peer port:");
-				String peerId = JOptionPane.showInputDialog("Enter peer ID:");
-				PeerInfo test = new PeerInfo(peerId.getBytes(), "127.0.0.1", Integer.parseInt(port));
-				
-				Torrent torrent = TorrentManager.getInstance().getTorrents().get(0);
-				Connection connection = new Connection(torrent.getPeerManager(), test);
-				torrent.getPeerManager().addConnection(connection);
-				LoggingPanel.log("Successfully connected to peer!  ID = " + peerId);
 			}
 		});
 	}

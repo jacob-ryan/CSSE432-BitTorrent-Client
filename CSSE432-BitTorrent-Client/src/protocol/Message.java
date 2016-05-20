@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public abstract class Message {
 	public abstract void sendMessage(OutputStream out) throws IOException;
-	
+
 	public static Message readMessage(InputStream input) throws IOException {
 		byte[] lengthPrefix = new byte[4];
 		input.read(lengthPrefix);
@@ -18,9 +18,9 @@ public abstract class Message {
 		}
 		byte[] messageType = new byte[1];
 		input.read(messageType);
-		byte[] payload = new byte[messageLength-1];
+		byte[] payload = new byte[messageLength - 1];
 		input.read(payload);
-		switch(messageType[0]) {
+		switch (messageType[0]) {
 		case 0:
 			return new ChokeMessage();
 		case 1:
@@ -53,23 +53,22 @@ public abstract class Message {
 			throw new IOException("Unknown Message Type");
 		}
 	}
-	
-	public static byte[] intToByteArray(int a, int arraySize)
-	{
-	    byte[] ret = new byte[arraySize];
-	    for(int i = arraySize-1; i >= 0; i--) {
-	    	ret[i] = (byte) ((a >> ((arraySize-i) * 8)) & 0xFF);
-	    }
-	    return ret;
+
+	public static byte[] intToByteArray(int a, int arraySize) {
+		byte[] ret = new byte[4];
+		ret[3] = (byte) (a & 0xFF);
+		ret[2] = (byte) ((a >> 8) & 0xFF);
+		ret[1] = (byte) ((a >> 16) & 0xFF);
+		ret[0] = (byte) ((a >> 24) & 0xFF);
+		return ret;
 	}
-	
-	public static int byteArrayToInt(byte[] b) 
-	{
-	    int value = 0;
-	    for (int i = 0; i < 4; i++) {
-	        int shift = (4 - 1 - i) * 8;
-	        value += (b[i] & 0x000000FF) << shift;
-	    }
-	    return value;
+
+	public static int byteArrayToInt(byte[] b) {
+		int value = 0;
+		for (int i = 0; i < 4; i++) {
+			int shift = (4 - 1 - i) * 8;
+			value += (b[i] & 0x000000FF) << shift;
+		}
+		return value;
 	}
 }
