@@ -10,7 +10,7 @@ public class FileManager
 {
 	public static byte[] readData(String fileName, int pieceIndex, int begin, int length)
 	{
-		Path filePath = Paths.get("/" + fileName);
+		Path filePath = Paths.get(fileName);
 		byte[] filePiece = new byte[length];
 		try
 		{
@@ -22,7 +22,7 @@ public class FileManager
 		}
 		catch (IOException e)
 		{
-			System.err.println("Unable to read file " + fileName + ".");
+			LoggingPanel.log("Unable to read file " + fileName + ".");
 		}
 		
 		LoggingPanel.log("[FileManager] Incorrectly reading file " + fileName + "...");
@@ -31,10 +31,11 @@ public class FileManager
 	
 	public static void writeData(String fileName, int pieceIndex, int begin, byte[] data)
 	{
-		File f = new File("/" + fileName);
+		File f = new File(fileName);
 		if(f.exists() && !f.isDirectory()) { 
 		    try {
-		    	Path filePath = Paths.get("/" + fileName);
+		    	LoggingPanel.log("[FileManager] Writing additional data to " + fileName + "...");
+		    	Path filePath = Paths.get(fileName);
 		    	byte[] currentFile = java.nio.file.Files.readAllBytes(filePath);
 		    	if (data.length * pieceIndex > currentFile.length){
 		    		//Piece is outside range of current file
@@ -51,10 +52,11 @@ public class FileManager
 		    	}
 		    }
 		    catch (IOException e) {
-		    	System.err.println("Unable to open existing file.");
+		    	LoggingPanel.log("Unable to open existing file.");
 		    }
 		} else {
 			//New file
+			LoggingPanel.log("[FileManager] Creating file for " + fileName + "...");
 			byte[] newFile = new byte[data.length * (pieceIndex + 1)];
 			System.arraycopy(data, 0, newFile, pieceIndex*data.length, (pieceIndex+1)*data.length);
 			FileOutputStream out;
@@ -66,7 +68,7 @@ public class FileManager
 			}
 			catch (IOException e)
 			{
-				System.err.println("Unable to create file " + fileName + ".");
+				LoggingPanel.log("Unable to create file " + fileName + ".");
 			}
 		}
 		LoggingPanel.log("[FileManager] Writing data for " + fileName + "...");
