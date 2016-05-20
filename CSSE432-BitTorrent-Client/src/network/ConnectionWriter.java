@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.util.*;
 
+import filesystem.*;
 import protocol.*;
 
 public class ConnectionWriter extends Thread
@@ -87,6 +88,7 @@ public class ConnectionWriter extends Thread
 				if (toSend != null)
 				{
 					toSend.sendMessage(this.connection.getOutputStream());
+					System.out.println("[ConnectionWriter] Wrote message of type " + toSend.getClass());
 					// Keep track of all outstanding chunk requests.
 					if (toSend instanceof RequestMessage)
 					{

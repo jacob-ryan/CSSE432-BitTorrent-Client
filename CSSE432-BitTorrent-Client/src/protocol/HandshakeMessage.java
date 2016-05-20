@@ -86,11 +86,4 @@ public class HandshakeMessage
 		
 		return peerId;
 	}
-	
-	
-	
 }
-
-
-
-

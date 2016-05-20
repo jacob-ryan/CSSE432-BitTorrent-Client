@@ -37,7 +37,7 @@ public abstract class Message {
 		case 6:
 			int rIndex = byteArrayToInt(Arrays.copyOfRange(payload, 0, 4));
 			int rBegin = byteArrayToInt(Arrays.copyOfRange(payload, 4, 8));
-			int rLength = byteArrayToInt(Arrays.copyOfRange(payload, 8, payload.length));
+			int rLength = byteArrayToInt(Arrays.copyOfRange(payload, 8, 12));
 			return new RequestMessage(rIndex, rBegin, rLength);
 		case 7:
 			int index = byteArrayToInt(Arrays.copyOfRange(payload, 0, 4));
