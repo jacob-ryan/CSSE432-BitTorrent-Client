@@ -2,6 +2,7 @@ package network;
 
 import java.io.*;
 
+import filesystem.*;
 import protocol.*;
 
 public class ConnectionReader extends Thread

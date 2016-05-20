@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.util.*;
 
+import filesystem.*;
 import protocol.*;
 
 public class ConnectionWriter extends Thread

@@ -7,7 +7,7 @@ import protocol.*;
 
 public class Torrent
 {
-	public static final int PIECE_LENGTH = 2 >> 18;
+	public static final int PIECE_LENGTH = 2 << 18;
 	private String name;
 	private int pieceLength;
 	private List<String> trackers;
@@ -69,7 +69,7 @@ public class Torrent
 	{
 		this.fileName = name;
 		this.fileLength = length;
-		this.pieceHashes.add(null);
+		this.pieceHashes = new ArrayList<byte[]>();
 		this.pieceBitfield = Bitfield.make(this);
 	}
 	

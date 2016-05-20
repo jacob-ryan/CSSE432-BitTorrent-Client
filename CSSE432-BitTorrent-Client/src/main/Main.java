@@ -14,7 +14,8 @@ public class Main
 		new Window();
 		LoggingPanel.log("Created GUI window...");
 		
-		Torrent torrent = new Torrent("Foo Bar", 256 * 1024);
+		Torrent torrent = new Torrent("Testing.txt", 256 * 1024);
+		torrent.setFile("Testing.txt", 15);
 		TorrentManager.getInstance().addTorrent(torrent);
 	}
 }
