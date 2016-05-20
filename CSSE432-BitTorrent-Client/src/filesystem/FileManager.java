@@ -14,7 +14,7 @@ public class FileManager
 		byte[] filePiece = new byte[length];
 		try
 		{
-			byte[] fullFile = java.nio.file.Files.readAllBytes(filePath);
+			byte[] fullFile = Files.readAllBytes(filePath);
 			filePiece = Arrays.copyOfRange(fullFile, pieceIndex*length+begin, (pieceIndex+1)*length+begin);
 			
 			LoggingPanel.log("[FileManager] Reading data for " + fileName + "...");
@@ -36,7 +36,7 @@ public class FileManager
 		    try {
 		    	LoggingPanel.log("[FileManager] Writing additional data to " + fileName + "...");
 		    	Path filePath = Paths.get(fileName);
-		    	byte[] currentFile = java.nio.file.Files.readAllBytes(filePath);
+		    	byte[] currentFile = Files.readAllBytes(filePath);
 		    	if (data.length * pieceIndex > currentFile.length){
 		    		//Piece is outside range of current file
 		    		byte[] newFile = new byte[data.length * (pieceIndex + 1)];
